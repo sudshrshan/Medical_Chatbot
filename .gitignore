@@ -223,3 +223,4 @@ __pycache__/
 .conda/
 *.egg-info/
 research/
+Data/
