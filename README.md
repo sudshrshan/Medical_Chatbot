@@ -126,3 +126,4 @@ open up localhost:
    - PINECONE_API_KEY
    - CHAT_GROQ_API_KEY
 
+      - CHAT_GROQ_API_KEY
