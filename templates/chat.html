@@ -1,260 +1,951 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediBot | AI Medical Assistant</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <title>MediBot - Medical Assistant</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-    <div class="app">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-top">
-                <a href="#" class="brand-icon" title="MediBot"><i class="fa-solid fa-staff-snake"></i></a>
-                <button class="side-icon" type="button" title="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
-                <button class="side-icon" id="collapseSidebar" type="button" title="Collapse sidebar"><i class="fa-regular fa-square-caret-left"></i></button>
+
+<div class="app-container">
+
+    <!-- Mobile backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-header">
+
+            <div class="logo">
+                <div class="logo-icon">✚</div>
+                <span>MediBot</span>
             </div>
 
-            <nav class="nav">
-                <button class="nav-item active" id="newChat" type="button"><i class="fa-regular fa-pen-to-square"></i><span>Chat</span></button>
-                <button class="nav-item" type="button"><i class="fa-regular fa-images"></i><span>Imagine</span></button>
-                <button class="nav-item" type="button"><i class="fa-solid fa-book-open"></i><span>Library</span></button>
-                <button class="nav-item" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Automations</span></button>
-            </nav>
+            <button class="close-sidebar"
+                    id="closeSidebar"
+                    aria-label="Close sidebar">
+                &times;
+            </button>
 
-            <section class="side-section">
-                <div class="section-title">MediBot</div>
-                <button class="nav-item" type="button"><i class="fa-solid fa-robot"></i><span>Create a bot</span></button>
-            </section>
+        </div>
 
-            <section class="side-section">
-                <div class="section-title">Projects <i class="fa-solid fa-box-archive section-action"></i></div>
-                <button class="nav-item" type="button"><i class="fa-solid fa-plus"></i><span>Add project</span></button>
-            </section>
+        <!-- New Chat -->
+        <button class="new-chat-btn" id="newChatBtn">
+            <span class="plus-icon">+</span>
+            New chat
+        </button>
 
-            <section class="side-section chats-section">
-                <div class="section-title">Chats</div>
-                <div id="chatHistory" class="chat-history"></div>
-            </section>
+        <!-- Assistant -->
+        <div class="sidebar-section">
 
-            <div class="sidebar-bottom">
-                <button class="nav-item" type="button"><i class="fa-solid fa-puzzle-piece"></i><span>Plugins</span></button>
-                <div class="profile-row">
-                    <div class="profile-avatar">M</div>
-                    <span>MediBot User</span>
-                    <i class="fa-solid fa-ellipsis"></i>
+            <p class="sidebar-label">YOUR ASSISTANT</p>
+
+            <div class="sidebar-item active">
+                <span class="sidebar-item-icon">✚</span>
+                Medical Assistant
+            </div>
+
+        </div>
+
+        <!-- Chat History -->
+        <div class="history-section">
+
+            <div class="history-heading">
+                <p class="sidebar-label">CHAT HISTORY</p>
+                <span class="history-count" id="historyCount">0</span>
+            </div>
+
+            <div class="chat-history-list" id="chatHistoryList">
+                <!-- Saved conversations appear here -->
+            </div>
+
+        </div>
+
+        <!-- Sidebar Bottom -->
+        <div class="sidebar-bottom">
+
+            <div class="sidebar-help">
+                <span class="help-icon">ⓘ</span>
+
+                <div>
+                    <strong>Medical information</strong>
+                    <small>For informational purposes only</small>
                 </div>
             </div>
-        </aside>
 
-        <main class="main">
-            <header class="topbar">
-                <div class="mobile-brand"><i class="fa-solid fa-staff-snake"></i> MediBot</div>
-                <div class="topbar-right">
-                    <span><i class="fa-solid fa-circle-user"></i> MediBot Bot</span>
-                    <span><i class="fa-solid fa-user-shield"></i> Private</span>
+            <div class="sidebar-footer">
+
+                <div class="profile-avatar">M</div>
+
+                <div class="profile-info">
+                    <strong>MediBot</strong>
+                    <small>AI Medical Assistant</small>
                 </div>
-            </header>
 
-            <section class="welcome" id="welcomeScreen">
-                <div class="welcome-inner">
-                    <h1>I’m here on the doctor’s behalf.</h1>
-                    <p class="welcome-subtitle">Your AI medical assistant is here to help.</p>
+            </div>
 
-                    <form class="composer" id="messageArea">
-                        <textarea id="text" name="msg" rows="1" placeholder="Ask MediBot anything..." autocomplete="off" required></textarea>
-                        <div class="composer-bottom">
-                            <button class="round-tool" type="button" title="Add attachment"><i class="fa-solid fa-plus"></i></button>
-                            <div class="composer-actions">
-                                <span class="mode-label">Medical assistant <i class="fa-solid fa-chevron-down"></i></span>
-                                <button class="round-tool mic-button" type="button" title="Voice input"><i class="fa-solid fa-microphone"></i></button>
-                                <button class="send-button" type="submit" id="send" aria-label="Send"><i class="fa-solid fa-arrow-up"></i></button>
-                            </div>
-                        </div>
-                    </form>
+        </div>
 
-                    <div class="suggestions">
-                        <button type="button" data-prompt="What are some ways to improve my sleep?"><i class="fa-regular fa-moon"></i> Sleep</button>
-                        <button type="button" data-prompt="How can I maintain a balanced diet?"><i class="fa-solid fa-apple-whole"></i> Nutrition</button>
-                        <button type="button" data-prompt="What are common causes of headaches?"><i class="fa-solid fa-brain"></i> Symptoms</button>
-                    </div>
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <button class="hamburger"
+                    id="hamburger"
+                    aria-label="Open sidebar">
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </button>
+
+            <div class="mobile-brand">
+                <span class="logo-icon small-logo">✚</span>
+                <span>MediBot</span>
+            </div>
+
+            <!-- Medical Assistant Heading -->
+            <div class="assistant-brand">
+
+                <span class="status-dot"></span>
+
+                <span>Medical assistant</span>
+
+                <!-- Stethoscope Icon -->
+                <svg class="medical-logo"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8"
+                     stroke-linecap="round"
+                     stroke-linejoin="round"
+                     role="img"
+                     aria-label="Medical stethoscope">
+
+                    <path d="M6 3v5a4 4 0 0 0 8 0V3"/>
+                    <path d="M6 3H4v2"/>
+                    <path d="M14 3h2v2"/>
+                    <path d="M10 12v1a5 5 0 0 0 10 0v-1"/>
+                    <circle cx="20" cy="10" r="2"/>
+
+                </svg>
+
+            </div>
+
+            <div class="topbar-right">
+                <span class="secure-label">
+                    <span class="secure-icon">✓</span>
+                    AI Assistant
+                </span>
+            </div>
+
+        </header>
+
+
+        <!-- CHAT CONTENT -->
+        <section class="chat-content" id="chatContent">
+
+            <!-- Welcome Screen -->
+            <div class="welcome-screen" id="welcomeScreen">
+
+                <div class="welcome-icon">
+                    ✚
                 </div>
-            </section>
 
-            <section class="conversation hidden" id="conversationScreen">
-                <div class="messages" id="messageFormeight">
-                    <div class="message-row bot">
-                        <div class="message-avatar"><i class="fa-solid fa-staff-snake"></i></div>
-                        <div class="message-bubble">Hello! I'm MediBot. How can I assist you today?</div>
-                    </div>
+                <h1>How can I help you today?</h1>
+
+                <p class="welcome-description">
+                    I'm your AI medical assistant. Ask me questions
+                    about health, symptoms, medicines, and general
+                    medical information.
+                </p>
+
+                <!-- Suggestions -->
+                <div class="suggestion-grid">
+
+                    <button class="suggestion-card"
+                            data-message="What are the common symptoms of diabetes?">
+
+                        <span class="suggestion-icon">🩺</span>
+
+                        <span class="suggestion-title">
+                            Understand symptoms
+                        </span>
+
+                        <span class="suggestion-description">
+                            Learn about common health symptoms
+                        </span>
+
+                    </button>
+
+
+                    <button class="suggestion-card"
+                            data-message="How can I maintain a healthy diet?">
+
+                        <span class="suggestion-icon">🥗</span>
+
+                        <span class="suggestion-title">
+                            Healthy lifestyle
+                        </span>
+
+                        <span class="suggestion-description">
+                            Get general health and wellness tips
+                        </span>
+
+                    </button>
+
+
+                    <button class="suggestion-card"
+                            data-message="What are some common causes of headaches?">
+
+                        <span class="suggestion-icon">💊</span>
+
+                        <span class="suggestion-title">
+                            Medical information
+                        </span>
+
+                        <span class="suggestion-description">
+                            Explore general medical topics
+                        </span>
+
+                    </button>
+
+
+                    <button class="suggestion-card"
+                            data-message="How can I improve my sleep quality?">
+
+                        <span class="suggestion-icon">🌙</span>
+
+                        <span class="suggestion-title">
+                            Improve your sleep
+                        </span>
+
+                        <span class="suggestion-description">
+                            Discover healthy sleep habits
+                        </span>
+
+                    </button>
+
                 </div>
-                <form class="composer conversation-composer" id="conversationForm">
-                    <textarea id="conversationText" rows="1" placeholder="Message MediBot..." autocomplete="off" required></textarea>
-                    <div class="composer-bottom">
-                        <button class="round-tool" type="button" title="Add attachment"><i class="fa-solid fa-plus"></i></button>
-                        <div class="composer-actions">
-                            <span class="mode-label">Medical assistant <i class="fa-solid fa-chevron-down"></i></span>
-                            <button class="round-tool mic-button" type="button" title="Voice input"><i class="fa-solid fa-microphone"></i></button>
-                            <button class="send-button" type="submit" aria-label="Send"><i class="fa-solid fa-arrow-up"></i></button>
-                        </div>
-                    </div>
-                </form>
-                <p class="disclaimer">MediBot provides general information only and is not a substitute for professional medical advice.</p>
-            </section>
 
-            <p class="bottom-note" id="bottomNote"><i class="fa-solid fa-shield-heart"></i> MediBot can make mistakes. For medical concerns, consult a qualified healthcare professional.</p>
-        </main>
-    </div>
+                <p class="welcome-disclaimer">
+                    MediBot provides general information and is not
+                    a substitute for professional medical advice.
+                </p>
 
-    <script>
-        const welcomeScreen = document.getElementById("welcomeScreen");
-        const conversationScreen = document.getElementById("conversationScreen");
-        const messages = document.getElementById("messageFormeight");
-        const historyList = document.getElementById("chatHistory");
-        const welcomeInput = document.getElementById("text");
-        const conversationInput = document.getElementById("conversationText");
-        let hasStarted = false;
+            </div>
 
-        function scrollToBottom() {
-            messages.scrollTop = messages.scrollHeight;
+        </section>
+
+
+        <!-- MESSAGE COMPOSER -->
+        <footer class="composer-area">
+
+            <form class="message-form" id="messageForm">
+
+                <textarea
+                    id="messageInput"
+                    name="msg"
+                    rows="1"
+                    placeholder="Ask your medical question..."
+                    autocomplete="off"
+                    required></textarea>
+
+                <button type="submit"
+                        class="send-button"
+                        id="sendButton"
+                        aria-label="Send message">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <path d="M22 2 11 13"/>
+                        <path d="m22 2-7 20-4-9-9-4 20-7Z"/>
+
+                    </svg>
+
+                </button>
+
+            </form>
+
+            <p class="composer-disclaimer">
+                MediBot can make mistakes. Always consult a qualified
+                healthcare professional for medical advice.
+            </p>
+
+        </footer>
+
+    </main>
+
+</div>
+
+
+<!-- JAVASCRIPT -->
+<script>
+
+    // =====================================
+    // ELEMENTS
+    // =====================================
+
+    const sidebar = document.getElementById("sidebar");
+    const hamburger = document.getElementById("hamburger");
+    const closeSidebar = document.getElementById("closeSidebar");
+    const backdrop = document.getElementById("sidebarBackdrop");
+
+    const messageForm = document.getElementById("messageForm");
+    const messageInput = document.getElementById("messageInput");
+    const sendButton = document.getElementById("sendButton");
+
+    const chatContent = document.getElementById("chatContent");
+    const welcomeScreen = document.getElementById("welcomeScreen");
+
+    const newChatBtn = document.getElementById("newChatBtn");
+
+    const chatHistoryList = document.getElementById("chatHistoryList");
+    const historyCount = document.getElementById("historyCount");
+
+
+    // =====================================
+    // LOCAL STORAGE
+    // =====================================
+
+    const STORAGE_KEY = "medibot_chat_history";
+
+    let chats = [];
+
+    try {
+        const savedChats = JSON.parse(
+            localStorage.getItem(STORAGE_KEY)
+        );
+
+        if (Array.isArray(savedChats)) {
+            chats = savedChats.filter(chat =>
+                chat &&
+                typeof chat.id === "string" &&
+                Array.isArray(chat.messages)
+            );
         }
 
-        function resizeInput(input) {
-            input.style.height = "auto";
-            input.style.height = Math.min(input.scrollHeight, 140) + "px";
+    } catch (error) {
+        console.error("Error loading history:", error);
+        chats = [];
+    }
+
+    let currentChatId = null;
+
+
+    function saveChats() {
+
+        try {
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(chats)
+            );
+
+        } catch (error) {
+
+            console.error("Could not save chat history:", error);
+
+            alert(
+                "Chat history could not be saved. Browser storage may be full."
+            );
         }
 
-        [welcomeInput, conversationInput].forEach(input => {
-            input.addEventListener("input", () => resizeInput(input));
-            input.addEventListener("keydown", event => {
-                if (event.key === "Enter" && !event.shiftKey) {
-                    event.preventDefault();
-                    input.closest("form").requestSubmit();
+    }
+
+
+    function getCurrentChat() {
+
+        return chats.find(chat =>
+            chat.id === currentChatId
+        );
+
+    }
+
+
+    // =====================================
+    // CREATE NEW CHAT
+    // =====================================
+
+    function createChat() {
+
+        const chat = {
+
+            id: Date.now().toString() +
+                Math.random().toString(36).slice(2),
+
+            title: "New chat",
+
+            messages: [],
+
+            createdAt: new Date().toISOString()
+
+        };
+
+        chats.unshift(chat);
+
+        currentChatId = chat.id;
+
+        saveChats();
+
+        renderHistory();
+
+        renderCurrentChat();
+
+        return chat;
+
+    }
+
+
+    // =====================================
+    // RENDER CHAT HISTORY
+    // =====================================
+
+    function renderHistory() {
+
+        chatHistoryList.innerHTML = "";
+
+        historyCount.textContent = chats.length;
+
+        if (chats.length === 0) {
+
+            const empty = document.createElement("div");
+
+            empty.className = "history-empty";
+
+            empty.textContent =
+                "Your conversations will appear here.";
+
+            chatHistoryList.appendChild(empty);
+
+            return;
+
+        }
+
+
+        chats.forEach(chat => {
+
+            const item = document.createElement("div");
+
+            item.className = "history-item";
+
+            if (chat.id === currentChatId) {
+                item.classList.add("active");
+            }
+
+
+            const icon = document.createElement("span");
+
+            icon.className = "history-item-icon";
+
+            icon.textContent = "💬";
+
+
+            const title = document.createElement("span");
+
+            title.className = "history-item-title";
+
+            title.textContent = chat.title || "New chat";
+
+
+            const deleteButton = document.createElement("button");
+
+            deleteButton.className = "history-delete";
+
+            deleteButton.type = "button";
+
+            deleteButton.textContent = "×";
+
+            deleteButton.title = "Delete conversation";
+
+
+            // Delete conversation
+            deleteButton.addEventListener("click", function(event) {
+
+                event.stopPropagation();
+
+                const confirmed = confirm(
+                    "Are you sure you want to delete this conversation?"
+                );
+
+                if (!confirmed) return;
+
+                chats = chats.filter(c => c.id !== chat.id);
+
+                if (currentChatId === chat.id) {
+                    currentChatId = null;
                 }
+
+                saveChats();
+
+                if (!currentChatId && chats.length > 0) {
+                    currentChatId = chats[0].id;
+                }
+
+                renderHistory();
+
+                renderCurrentChat();
+
             });
+
+
+            item.appendChild(icon);
+
+            item.appendChild(title);
+
+            item.appendChild(deleteButton);
+
+
+            // Open previous conversation
+            item.addEventListener("click", function() {
+
+                currentChatId = chat.id;
+
+                renderHistory();
+
+                renderCurrentChat();
+
+                closeSidebarMenu();
+
+            });
+
+
+            chatHistoryList.appendChild(item);
+
         });
 
-        function addMessage(text, sender, time) {
-            const row = document.createElement("div");
-            row.className = "message-row " + sender;
+    }
 
-            if (sender === "bot") {
-                const avatar = document.createElement("div");
-                avatar.className = "message-avatar";
-                avatar.innerHTML = '<i class="fa-solid fa-staff-snake"></i>';
-                row.appendChild(avatar);
-            }
 
-            const bubble = document.createElement("div");
-            bubble.className = "message-bubble";
-            bubble.textContent = text;
+    // =====================================
+    // DISPLAY MESSAGES
+    // =====================================
 
-            const timestamp = document.createElement("span");
-            timestamp.className = "message-time";
-            timestamp.textContent = time;
-            bubble.appendChild(timestamp);
-            row.appendChild(bubble);
+    function addMessage(message, type) {
 
-            if (sender === "user") {
-                const avatar = document.createElement("div");
-                avatar.className = "message-avatar user-avatar";
-                avatar.innerHTML = '<i class="fa-solid fa-user"></i>';
-                row.appendChild(avatar);
-            }
+        const messageRow = document.createElement("div");
 
-            messages.appendChild(row);
-            scrollToBottom();
-            return row;
+        messageRow.className = "message-row " + type;
+
+
+        const avatar = document.createElement("div");
+
+        avatar.className = "message-avatar";
+
+        avatar.textContent =
+            type === "user" ? "You" : "✚";
+
+
+        const bubble = document.createElement("div");
+
+        bubble.className = "message-bubble";
+
+
+        const text = document.createElement("p");
+
+        text.textContent = message;
+
+
+        bubble.appendChild(text);
+
+        messageRow.appendChild(avatar);
+
+        messageRow.appendChild(bubble);
+
+        chatContent.appendChild(messageRow);
+
+        chatContent.scrollTop = chatContent.scrollHeight;
+
+    }
+
+
+    // =====================================
+    // LOAD SELECTED CONVERSATION
+    // =====================================
+
+    function renderCurrentChat() {
+
+        chatContent.querySelectorAll(".message-row").forEach(row => {
+            row.remove();
+        });
+
+
+        const chat = getCurrentChat();
+
+
+        if (!chat || chat.messages.length === 0) {
+
+            welcomeScreen.style.display = "block";
+
+            return;
+
         }
 
-        async function sendMessage(rawText) {
-            const message = rawText.trim();
-            if (!message) return;
 
-            const now = new Date();
-            const time = now.getHours().toString().padStart(2, "0") + ":" +
-                         now.getMinutes().toString().padStart(2, "0");
+        welcomeScreen.style.display = "none";
 
-            if (!hasStarted) {
-                welcomeScreen.classList.add("hidden");
-                conversationScreen.classList.remove("hidden");
-                document.getElementById("bottomNote").classList.add("hidden");
-                hasStarted = true;
 
-                const historyItem = document.createElement("button");
-                historyItem.className = "history-item";
-                historyItem.type = "button";
-                historyItem.textContent = message.length > 34 ? message.slice(0, 34) + "..." : message;
-                historyList.appendChild(historyItem);
-                messages.replaceChildren();
-            }
+        chat.messages.forEach(message => {
 
-            addMessage(message, "user", time);
+            addMessage(
+                message.text,
+                message.role
+            );
 
-            const typing = document.createElement("div");
-            typing.className = "message-row bot";
-            typing.id = "typing-indicator";
-            typing.innerHTML = '<div class="message-avatar"><i class="fa-solid fa-staff-snake"></i></div><div class="message-bubble typing"><span></span><span></span><span></span></div>';
-            messages.appendChild(typing);
-            scrollToBottom();
+        });
 
-            try {
-                const response = await fetch("/get", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-                    body: new URLSearchParams({ msg: message })
-                });
 
-                if (!response.ok) throw new Error("Request failed: " + response.status);
-                const answer = await response.text();
-                typing.remove();
-                addMessage(answer, "bot", time);
-            } catch (error) {
-                typing.remove();
-                addMessage("Sorry, I couldn't connect to MediBot. Please try again.", "bot", time);
-                console.error(error);
-            }
+        chatContent.scrollTop = chatContent.scrollHeight;
+
+    }
+
+
+    // =====================================
+    // LOADING INDICATOR
+    // =====================================
+
+    function showLoading() {
+
+        const loadingRow = document.createElement("div");
+
+        loadingRow.className = "message-row bot loading-row";
+
+        loadingRow.id = "loadingMessage";
+
+
+        const avatar = document.createElement("div");
+
+        avatar.className = "message-avatar";
+
+        avatar.textContent = "✚";
+
+
+        const bubble = document.createElement("div");
+
+        bubble.className = "message-bubble loading-bubble";
+
+        bubble.innerHTML = `
+            <span></span>
+            <span></span>
+            <span></span>
+        `;
+
+
+        loadingRow.appendChild(avatar);
+
+        loadingRow.appendChild(bubble);
+
+        chatContent.appendChild(loadingRow);
+
+        chatContent.scrollTop = chatContent.scrollHeight;
+
+    }
+
+
+    function removeLoading() {
+
+        const loading = document.getElementById("loadingMessage");
+
+        if (loading) {
+            loading.remove();
         }
 
-        document.getElementById("messageArea").addEventListener("submit", event => {
-            event.preventDefault();
-            const value = welcomeInput.value;
-            welcomeInput.value = "";
-            resizeInput(welcomeInput);
-            sendMessage(value);
+    }
+
+
+    // =====================================
+    // SEND MESSAGE TO FLASK
+    // =====================================
+
+    async function sendMessage(message) {
+
+        message = message.trim();
+
+        if (!message || sendButton.disabled) return;
+
+
+        let chat = getCurrentChat();
+
+        if (!chat) {
+            chat = createChat();
+        }
+
+
+        // Save user message
+        chat.messages.push({
+
+            role: "user",
+
+            text: message
+
         });
 
-        document.getElementById("conversationForm").addEventListener("submit", event => {
-            event.preventDefault();
-            const value = conversationInput.value;
-            conversationInput.value = "";
-            resizeInput(conversationInput);
-            sendMessage(value);
-        });
 
-        document.querySelectorAll("[data-prompt]").forEach(button => {
-            button.addEventListener("click", () => {
-                welcomeInput.value = button.dataset.prompt;
-                resizeInput(welcomeInput);
-                welcomeInput.focus();
+        // Generate conversation title
+        if (chat.title === "New chat") {
+
+            chat.title = message.length > 35
+                ? message.substring(0, 35) + "..."
+                : message;
+
+        }
+
+
+        saveChats();
+
+        renderHistory();
+
+
+        welcomeScreen.style.display = "none";
+
+        addMessage(message, "user");
+
+
+        messageInput.value = "";
+
+        messageInput.style.height = "auto";
+
+
+        showLoading();
+
+        sendButton.disabled = true;
+
+
+        try {
+
+            const response = await fetch("/get", {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/x-www-form-urlencoded;charset=UTF-8"
+
+                },
+
+                body: new URLSearchParams({
+
+                    msg: message
+
+                })
+
             });
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Server error: " + response.status
+                );
+
+            }
+
+
+            const answer = await response.text();
+
+            removeLoading();
+
+
+            // Save bot response
+            chat.messages.push({
+
+                role: "bot",
+
+                text: answer
+
+            });
+
+
+            saveChats();
+
+            addMessage(answer, "bot");
+
+
+        } catch (error) {
+
+            removeLoading();
+
+            const errorMessage =
+                "Sorry, something went wrong. Please try again.";
+
+
+            chat.messages.push({
+
+                role: "bot",
+
+                text: errorMessage
+
+            });
+
+
+            saveChats();
+
+            addMessage(errorMessage, "bot");
+
+            console.error("Chat error:", error);
+
+
+        } finally {
+
+            sendButton.disabled = false;
+
+            messageInput.focus();
+
+        }
+
+    }
+
+
+    // =====================================
+    // FORM SUBMISSION
+    // =====================================
+
+    messageForm.addEventListener("submit", function(event) {
+
+        event.preventDefault();
+
+        sendMessage(messageInput.value);
+
+    });
+
+
+    // Enter sends message
+    // Shift + Enter creates a new line
+
+    messageInput.addEventListener("keydown", function(event) {
+
+        if (event.key === "Enter" && !event.shiftKey) {
+
+            event.preventDefault();
+
+            messageForm.requestSubmit();
+
+        }
+
+    });
+
+
+    // Auto resize textarea
+    messageInput.addEventListener("input", function() {
+
+        this.style.height = "auto";
+
+        this.style.height =
+            Math.min(this.scrollHeight, 150) + "px";
+
+    });
+
+
+    // =====================================
+    // SUGGESTION CARDS
+    // =====================================
+
+    document.querySelectorAll(".suggestion-card").forEach(card => {
+
+        card.addEventListener("click", function() {
+
+            const message =
+                this.getAttribute("data-message");
+
+            sendMessage(message);
+
         });
 
-        document.getElementById("newChat").addEventListener("click", () => {
-            messages.replaceChildren();
-            historyList.replaceChildren();
-            hasStarted = false;
-            conversationScreen.classList.add("hidden");
-            welcomeScreen.classList.remove("hidden");
-            document.getElementById("bottomNote").classList.remove("hidden");
-            welcomeInput.value = "";
-            conversationInput.value = "";
-        });
+    });
 
-        document.getElementById("collapseSidebar").addEventListener("click", () => {
-            document.getElementById("sidebar").classList.toggle("collapsed");
-        });
-    </script>
+
+    // =====================================
+    // NEW CHAT BUTTON
+    // =====================================
+
+    newChatBtn.addEventListener("click", function() {
+
+        createChat();
+
+        messageInput.value = "";
+
+        messageInput.style.height = "auto";
+
+        closeSidebarMenu();
+
+        messageInput.focus();
+
+    });
+
+
+    // =====================================
+    // MOBILE SIDEBAR
+    // =====================================
+
+    function openSidebar() {
+
+        sidebar.classList.add("sidebar-open");
+
+        backdrop.classList.add("backdrop-visible");
+
+    }
+
+
+    function closeSidebarMenu() {
+
+        sidebar.classList.remove("sidebar-open");
+
+        backdrop.classList.remove("backdrop-visible");
+
+    }
+
+
+    hamburger.addEventListener("click", openSidebar);
+
+    closeSidebar.addEventListener("click", closeSidebarMenu);
+
+    backdrop.addEventListener("click", closeSidebarMenu);
+
+
+    document.addEventListener("keydown", function(event) {
+
+        if (event.key === "Escape") {
+
+            closeSidebarMenu();
+
+        }
+
+    });
+
+
+    // =====================================
+    // INITIALIZE APP
+    // =====================================
+
+    if (chats.length > 0) {
+
+        currentChatId = chats[0].id;
+
+    }
+
+    renderHistory();
+
+    renderCurrentChat();
+
+</script>
+
 </body>
 </html>
